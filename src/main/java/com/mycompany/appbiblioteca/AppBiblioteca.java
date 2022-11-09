@@ -12,8 +12,7 @@ package com.mycompany.appbiblioteca;
 public class AppBiblioteca {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
-        
-        new Pantalla();
+        System.out.println("Bienvenido al Sistema de Bibliotecas - Grupo 15");
+        System.out.println("===============================================\n");
     }
 }
