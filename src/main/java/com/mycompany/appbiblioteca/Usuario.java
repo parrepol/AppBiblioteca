@@ -4,6 +4,9 @@
  */
 package com.mycompany.appbiblioteca;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author Lalo Guzmán
@@ -31,8 +34,11 @@ public class Usuario {
     /**
      * @param rut the run to set
      */
-    public void setRun(String rut) {
-        this.run = rut;
+    public void setRun(String run) {
+        if (!validarRUN(run)) {
+            msjError("RUT Inválido");
+        }
+        this.run = run.toUpperCase();
     }
 
     /**
@@ -60,6 +66,9 @@ public class Usuario {
      * @param genero the genero to set
      */
     public void setGenero(char genero) {
+        if (genero != 'M' && genero != 'F') {
+            msjError("Genero debe ser M o F");
+        }
         this.genero = genero;
     }
 
@@ -77,6 +86,45 @@ public class Usuario {
         this.prestamo = prestamo;
     }
     
+    private  boolean validarRUN(String run){
+        System.out.println("validarRUN");
+        run = run.toUpperCase();
+        //Validamos largo mínimo para evitar el típico 1-9
+        if (run.length() < 8 || run.length() > 11) return false;
+        
+        //Validamos que el rut tenga formato XXXXXX-X
+        Pattern pattern = Pattern.compile("^[0-9]+-[0-9kK]{1}$");
+        Matcher matcher = pattern.matcher(run);
+        if ( matcher.matches() == false ) return false;
+        
+        //Validamos dígito verificador
+        String[] stringRun = run.split("-");
+        int runInt = Integer.parseInt( stringRun[0] );
+        char dv = stringRun[1].charAt(0);
+        int contador = 2;
+        int acumulado = 0;
+        int multiplo = 0;
+        while (runInt != 0){
+            multiplo=(runInt % 10) * contador;
+            acumulado += multiplo;
+            runInt = runInt / 10;
+            contador += 1;
+            if(contador == 8) contador = 2;
+        }
+        int resto = acumulado % 11;
+        String digito = String.valueOf(11 - resto);
+        if (digito.equals("11")) {
+            digito = "0";
+        }
+        if (digito.equals("10")) {
+            digito = "K";
+        }
+        
+        if (dv != digito.charAt(0)) return false;
+        
+        return true;
+    }
+    
     private void msjError(String msj) {
         throw new IllegalArgumentException(msj);
     }   
@@ -91,7 +139,7 @@ public class Usuario {
            if (getPrestamo() == "0") {
                texto += "Sin préstamo vigente \n";
            }else{
-               texto += "Con prestamovigente (" + getPrestamo() + ")";
+               texto += "Con prestamo vigente (" + getPrestamo() + ")";
            }
         return texto;
     }
